@@ -16,6 +16,7 @@ var app = http.createServer(function(request,response){
       return;
     }
     response.writeHead(200);
+    //data 경로에 있는 파일 중 queryData.id의 이름을 가진 파일이 description에 담김
     fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description) {
       var template = `
       <!doctype html>
@@ -38,7 +39,5 @@ var app = http.createServer(function(request,response){
       `;
       response.end(template);
     })
-
-
 });
 app.listen(3000);
