@@ -1,0 +1,11 @@
+//method = "get" 혹은 디폴트 상황에서는 url에 데이터를 포함한다.
+//서버 데이터를 수정, 삭제, 생성할 때는 url에서 데이터를 가려주는 method = "post"를 이용하자.
+<form action = "http://localhost:3000/process create" method = "get">
+    <p><input type = "text" name = "title"></p>
+    <p>
+        <textarea name = "description"></textarea>
+    </p>
+    <p>
+        <input type = "submit">
+    </p>
+</form>
