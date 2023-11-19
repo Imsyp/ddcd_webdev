@@ -47,7 +47,7 @@ var app = http.createServer(function(request,response){
             var template = templateHTML(title, list, 
               `<h2>${title}</h2>${description}`, 
               `<a href = "/create">create</a>`
-            );  //home에서는 update 빼고 create만
+            ); 
             response.writeHead(200);
             response.end(template);
           })
@@ -59,7 +59,7 @@ var app = http.createServer(function(request,response){
               var template = templateHTML(title, list, 
                 `<h2>${title}</h2>${description}`, 
                 `<a href = "/create">create</a> <a href = "/update?id=${title}">update</a>`  
-              );  //id값을 선택한 페이지에서는 update ui가 나오도록
+              ); 
               response.writeHead(200);
               response.end(template);
             });
@@ -69,9 +69,8 @@ var app = http.createServer(function(request,response){
       fs.readdir('./data', function(error, filelist) {
         var title = 'Web - create';
         var list = templateList(filelist);
-        //place holder는 text input 박스 안에 나타나는 텍스트
         var template = templateHTML(title, list, `
-        <form action = "http://localhost:3000/create_process" method = "post">
+        <form action = "/create_process" method = "post">
           <p><input type = "text" name = "title" placeholder = "title"></p>
           <p>
             <textarea name = "description" placeholder = "description"></textarea>
@@ -86,22 +85,59 @@ var app = http.createServer(function(request,response){
       }); 
     } else if(pathname === '/create_process') {
       var body = '';
-      //request <- var app = http.createServer(function(request,response)
-      //사용자가 요청할 때 웹브라우저에서 제공하는 정보
       request.on('data', function(data) {
         body += data;
       });
-      //정보 수신이 끝난 시점
-      //post.tile과 post.description과 같은 방식으로 post 데이터에 접근할 수 있음
       request.on('end', function() {
         var post = qs.parse(body);
         var title = post.title;
         var description = post.description
         fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
-          //302: 페이지를 다른 곳으로 redirection한다는 뜻
           response.writeHead(302, {Location: `/?id=${title}`});
           response.end();
         })
+      });
+    } else if (pathname === '/update') {
+      fs.readdir('./data', function(error, filelist) {
+        fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description) {
+          var title = queryData.id;
+          var list = templateList(filelist);
+          var template = templateHTML(title, list,
+            `
+            <form action = "/update_process" method = "post">
+            <input type = "hidden" name="id" value = "${title}">
+            <p><input type = "text" name = "title" placeholder = "title" value = "${title}"></p>
+            <p>
+              <textarea name = "description" placeholder = "description">value = "${description}"</textarea>
+            </p>
+            <p>
+              <input type = "submit">
+            </p>
+          </form>
+            `, 
+            `<a href = "/create">create</a> <a href = "/update?id=${title}">update</a>`  
+          ); 
+          response.writeHead(200);
+          response.end(template);
+        });
+      });
+    } else if (pathname === '/update_process') {
+      var body = '';
+      request.on('data', function(data) {
+        body += data;
+      });
+      request.on('end', function() {
+        var post = qs.parse(body);
+        var id = post.id;
+        var title = post.title;
+        var description = post.description;
+        //기존 파일명 id를 새로 입력한 title로 변경
+        fs.rename(`data/${id}`, `data/${title}`, function(error) {
+          fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
+            response.writeHead(302, {Location: `/?id=${title}`});
+            response.end();
+          })
+        });
       });
     } else {
       response.writeHead(404);
