@@ -12,5 +12,5 @@ a[0]();
 var o = {
     func:f
 }
-o.func();
+o.func(); 
 
