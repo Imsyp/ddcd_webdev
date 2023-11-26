@@ -31,7 +31,7 @@ var app = http.createServer(function(request,response){
             var filterdId = path.parse(queryData.id).base;  //« ≈Õ∏µ
             fs.readFile(`data/${filterdId}`, 'utf8', function(err, description) {
               var title = queryData.id;
-              var sanitizedTitle = sanitizeHtml(title);
+              var sanitizedTitle = sanitizeHtml(title);  
               var sanitizedDescription = sanitizeHtml(description, {
                 allowedTags: ['h1']
               });
